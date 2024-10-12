@@ -2,8 +2,8 @@ package com.example.kotlin
 
 data class User(
     val id: Int,
-    val name: String,
-    val year: Int,
-    val color: String,
-    val pantone_value: String
+    val email: String,
+    val first_name: String,
+    val last_name: String,
+    val avatar: String
 )

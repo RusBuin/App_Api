@@ -47,14 +47,16 @@ dependencies {
     implementation(libs.androidx.constraintlayout)
     implementation("com.squareup.retrofit2:retrofit:2.9.0") // Replace with the latest version
     implementation("com.squareup.retrofit2:converter-gson:2.9.0") // Gson converter for JSON parsing
-    implementation("com.squareup.retrofit2:retrofit:2.9.0")
-    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation("com.squareup.okhttp3:logging-interceptor:4.9.0")
 
-
+    // Зависимость Glide
+    implementation("com.github.bumptech.glide:glide:4.14.2")
+    implementation(libs.androidx.preference.ktx) // Используйте последнюю версию
+    kapt("com.github.bumptech.glide:compiler:4.14.2") // KAPT для Glide
 
     // Тестирование
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 }
+

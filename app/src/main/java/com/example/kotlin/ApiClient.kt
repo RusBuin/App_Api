@@ -7,15 +7,14 @@ object ApiClient {
 
     private const val BASE_URL = "https://reqres.in/api/"
 
-    private var retrofit: Retrofit? = null
+    private val retrofit by lazy {
+        Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+    }
 
-    fun getApiService(): ApiService {
-        if (retrofit == null) {
-            retrofit = Retrofit.Builder()
-                .baseUrl(BASE_URL)  // Здесь задаем базовый URL
-                .addConverterFactory(GsonConverterFactory.create())  // Для работы с JSON
-                .build()
-        }
-        return retrofit!!.create(ApiService::class.java)
+    val api: ApiService by lazy {
+        retrofit.create(ApiService::class.java)
     }
 }

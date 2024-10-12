@@ -33,7 +33,7 @@ class RegistrationActivity : AppCompatActivity() {
         textViewError = findViewById(R.id.textViewError)
         progressBar = findViewById(R.id.progressBar)
         buttonRegister = findViewById(R.id.buttonRegister)
-        textViewResult = findViewById(R.id.textViewResult) // Добавляем TextView для отображения результата
+        textViewResult = findViewById(R.id.textViewResult)
 
         buttonRegister.setOnClickListener {
             registerUser()
@@ -48,33 +48,31 @@ class RegistrationActivity : AppCompatActivity() {
 
         showLoading()
 
-        val apiService = ApiClient.getApiService()
+        val apiService = ApiClient.api
         val request = RegistrationRequest(email, password)
 
         apiService.registerUser(request).enqueue(object : Callback<RegistrationResponse> {
             override fun onResponse(call: Call<RegistrationResponse>, response: Response<RegistrationResponse>) {
                 hideLoading()
                 if (response.isSuccessful) {
-                    // Получаем id и token из ответа
                     val registrationResponse = response.body()
-                    val userId = registrationResponse?.id
+                    val userId = registrationResponse?.id?.toString()
                     val token = registrationResponse?.token
 
                     Log.d(TAG, "Registration successful for user: $email with ID: $userId and Token: $token")
 
-                    // Отображаем id и token
+                    saveRegistrationInfo(userId, token)
+
                     textViewResult.text = "ID: $userId\nToken: $token"
                     textViewResult.visibility = View.VISIBLE
 
-                    // Переход на другую активность, если нужно
-                    // val intent = Intent(this@RegistrationActivity, UserListActivity::class.java)
-                    // startActivity(intent)
-                    // finish()
-
+                    val intent = Intent(this@RegistrationActivity, UserListActivity::class.java)
+                    startActivity(intent)
+                    finish()
                 } else {
                     val errorBody = response.errorBody()?.string()
                     Log.e(TAG, "Registration failed: ${response.code()} - ${response.message()} - $errorBody")
-                    showError("Registration failed: ${response.message()}")
+                    showError("Registration failed: $errorBody")
                 }
             }
 
@@ -86,6 +84,14 @@ class RegistrationActivity : AppCompatActivity() {
         })
     }
 
+    private fun saveRegistrationInfo(userId: String?, token: String?) {
+        val sharedPreferences = getSharedPreferences("myPrefs", MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+        editor.putString("userId", userId)
+        editor.putString("token", token)
+        editor.apply()
+    }
+
     private fun showError(message: String) {
         textViewError.text = message
         textViewError.visibility = View.VISIBLE
@@ -95,7 +101,7 @@ class RegistrationActivity : AppCompatActivity() {
         progressBar.visibility = View.VISIBLE
         buttonRegister.isEnabled = false
         textViewError.visibility = View.GONE
-        textViewResult.visibility = View.GONE // Скрываем результат при начале загрузки
+        textViewResult.visibility = View.GONE
     }
 
     private fun hideLoading() {
