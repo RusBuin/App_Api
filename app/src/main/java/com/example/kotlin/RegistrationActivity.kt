@@ -11,36 +11,29 @@ import androidx.appcompat.app.AppCompatActivity
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import com.example.kotlin.ApiClient
 import android.util.Log
-
 
 class RegistrationActivity : AppCompatActivity() {
 
     private val TAG = "RegistrationActivity"
 
-
     private lateinit var editTextEmail: EditText
     private lateinit var editTextPassword: EditText
-
     private lateinit var buttonRegister: Button
     private lateinit var textViewError: TextView
     private lateinit var progressBar: ProgressBar
+    private lateinit var textViewResult: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.registration)
 
-
         editTextEmail = findViewById(R.id.editTextEmail)
         editTextPassword = findViewById(R.id.editTextPassword)
-
         textViewError = findViewById(R.id.textViewError)
         progressBar = findViewById(R.id.progressBar)
         buttonRegister = findViewById(R.id.buttonRegister)
-
-
-
+        textViewResult = findViewById(R.id.textViewResult) // Добавляем TextView для отображения результата
 
         buttonRegister.setOnClickListener {
             registerUser()
@@ -48,15 +41,10 @@ class RegistrationActivity : AppCompatActivity() {
     }
 
     private fun registerUser() {
-
         val email = editTextEmail.text.toString()
         val password = editTextPassword.text.toString()
 
-
         Log.d("RegistrationData", "Email: $email, Password: $password")
-
-
-
 
         showLoading()
 
@@ -67,17 +55,25 @@ class RegistrationActivity : AppCompatActivity() {
             override fun onResponse(call: Call<RegistrationResponse>, response: Response<RegistrationResponse>) {
                 hideLoading()
                 if (response.isSuccessful) {
-                    Log.d(TAG, "Registration successful for user: $email")
+                    // Получаем id и token из ответа
+                    val registrationResponse = response.body()
+                    val userId = registrationResponse?.id
+                    val token = registrationResponse?.token
 
-                    val intent = Intent(this@RegistrationActivity, UserListActivity::class.java)
-                    startActivity(intent)
-                    finish()
+                    Log.d(TAG, "Registration successful for user: $email with ID: $userId and Token: $token")
+
+                    // Отображаем id и token
+                    textViewResult.text = "ID: $userId\nToken: $token"
+                    textViewResult.visibility = View.VISIBLE
+
+                    // Переход на другую активность, если нужно
+                    // val intent = Intent(this@RegistrationActivity, UserListActivity::class.java)
+                    // startActivity(intent)
+                    // finish()
+
                 } else {
-
                     val errorBody = response.errorBody()?.string()
-
                     Log.e(TAG, "Registration failed: ${response.code()} - ${response.message()} - $errorBody")
-
                     showError("Registration failed: ${response.message()}")
                 }
             }
@@ -85,7 +81,6 @@ class RegistrationActivity : AppCompatActivity() {
             override fun onFailure(call: Call<RegistrationResponse>, t: Throwable) {
                 hideLoading()
                 Log.e(TAG, "Network error: ${t.message}")
-
                 showError("Network error: ${t.message}")
             }
         })
@@ -100,6 +95,7 @@ class RegistrationActivity : AppCompatActivity() {
         progressBar.visibility = View.VISIBLE
         buttonRegister.isEnabled = false
         textViewError.visibility = View.GONE
+        textViewResult.visibility = View.GONE // Скрываем результат при начале загрузки
     }
 
     private fun hideLoading() {

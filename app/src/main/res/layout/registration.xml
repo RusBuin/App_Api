@@ -28,6 +28,16 @@
         android:layout_height="48dp"
         android:text="Register" />
 
+    <TextView
+        android:id="@+id/textViewResult"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:text="Result"
+        android:textSize="16sp"
+        android:textColor="@android:color/black"/>
+
+
     <ProgressBar
         android:id="@+id/progressBar"
         android:layout_width="wrap_content"
